@@ -8,7 +8,7 @@ load_dotenv()
 
 # Get API key from environment variables
 #api_key = os.getenv("OPENROUTER_API_KEY")
-api_key="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"
+api_key="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"
 if not api_key:
     st.error("No OpenRouter API key found. Please add it to your .env file as OPENROUTER_API_KEY=your_api_key_here")
     st.stop()
@@ -17,20 +17,20 @@ if not api_key:
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=api_key,
-    default_headers={
-        "HTTP-Referer": "https://github.com/yourusername/yourproject",  # Required by OpenRouter
-    }
+   
 )
 
 def get_accounting_advice(transaction_description):
     response = client.chat.completions.create(
-        model="deepseek/deepseek-chat",  # Corrected model identifier for OpenRouter
+        model="google/gemini-2.0-pro-exp-02-05:free",  # Corrected model identifier for OpenRouter
         messages=[
-            {"role": "user", "content": f"""Som en erfaren svensk revisor och redovisningskonsult, förklara detaljerat hur följande transaktion ska bokföras enligt svensk redovisningssed och skattelagstiftning:
+            {"role": "user", "content": f"""Som en mycket erfaren svensk revisor och redovisningskonsult, förklara detaljerat hur följande transaktion ska bokföras enligt svensk redovisningssed och skattelagstiftning:
 
             Transaktion: {transaction_description}
 
-            Analysera noggrant:
+            Input är beskrivningen av transaktionen som är skriven på svenska.
+            
+            Analysera mycket noggrant:
             - Transaktionens natur (inköp eller försäljning)
             - Momsskyldighet och korrekt momssats (25%, 12%, 6% eller 0%)
             - Vid försäljning: Utgående moms (debit) ska visas i kreditkolumnen
@@ -46,6 +46,11 @@ def get_accounting_advice(transaction_description):
 
             VIKTIGT: Vid försäljning/intäkt ska utgående moms (konto 2610-2630) visas i kreditkolumnen.
             Vid inköp/kostnad ska ingående moms (konto 2640-2650) visas i debitkolumnen.
+            En transaktion kan aldig ha ALDRIG ha både ingående och utgående moms samtidigt.
+            VIKTIGT: Var extra noga med att tabellen är helt korrekt och att momsen hanteras på rätt sätt.
+            Debet och kredit ska vara korrekt placerade för att bokföringen ska vara rätt.
+            Om samma kontonummer förekommer flera gånger i samma kolumn ska beloppen summeras och bara visas en gång. 
+            Totalt belopp i kreditkolumnen och totalt belopp i debetkolumnen ska vara lika om konteringen är korrekt.
 
             2. Utförlig förklaring:
             - Beskriv bokföringen och varför specifika konton används
@@ -58,8 +63,8 @@ def get_accounting_advice(transaction_description):
             - Påpeka eventuella vanliga fel eller missförstånd
             - Ge konkreta råd om vilken dokumentation som krävs
 
-            Använd BAS-kontoplanen som referens och ange alltid både kontonummer och kontonamn.
-            Var särskilt noggrann med att följa svensk bokföringslag och momslagstiftning."""}
+            Använd alltid konton från den svenska BAS-kontoplanen och ange alltid både kontonummer och kontonamn.
+            Var särskilt noggrann med att följa svensk bokföringslag och momslagstiftning. Var också noga med korrekt svenskt språk i svaret."""}
         ]
     )
     return response.choices[0].message.content
@@ -117,10 +122,10 @@ def main():
     
     # Header
     st.title("Bokföringshjälpen")
-    st.markdown("<p style='text-align: center;'>Få AI-assisterad vägledning för din bokföring with Deepseek</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>Få AI-assisterad vägledning för din bokföring</p>", unsafe_allow_html=True)
     
     # Input section
-    st.subheader("Beskriv transaktionen")
+    st.subheader("Beskriv transaktionen så noggrant som möjligt, för bästa resultat")
     transaction = st.text_area("Transaktionsbeskrivning", placeholder="Exempel: Sålt tjänster för 10 000 kr + moms till ett svenskt företag", height=150)
     
     # Buttons in two columns
