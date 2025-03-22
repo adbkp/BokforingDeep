@@ -8,7 +8,8 @@ load_dotenv()
 
 # Get API key from environment variables
 #api_key = os.getenv("OPENROUTER_API_KEY")
-api_key="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"
+api_key = st.secrets["api_keys"]["OPENROUTER_API_KEY"]
+#api_key="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"
 if not api_key:
     st.error("No OpenRouter API key found. Please add it to your .env file as OPENROUTER_API_KEY=your_api_key_here")
     st.stop()
